@@ -1,3 +1,16 @@
+// 1. MAPEAMENTO DE ELEMENTOS DO DOM (No topo do arquivo para evitar erros de inicialização)
+const questionCounterEl = document.getElementById("question-counter");
+const questionTextEl = document.getElementById("question-text");
+const optionsContainerEl = document.getElementById("options-container");
+const nextBtn = document.getElementById("next-btn");
+const gameBox = document.getElementById("game-box");
+const resultBox = document.getElementById("result-box");
+const scoreTextEl = document.getElementById("score-text");
+const restartBtn = document.getElementById("restart-btn");
+const timerDisplayEl = document.getElementById("timer-display");
+const streakDisplayEl = document.getElementById("streak-display");
+
+// 2. BANCO DE DADOS DO QUIZ
 const questions = [
     {
         question: "Qual técnica agrícola ajuda a reter água no solo, evitar a erosão e fixar carbono, sem a necessidade de revolver a terra antes do plantio?",
@@ -40,7 +53,7 @@ const questions = [
         answer: 0
     },
     {
-        question: "O que é a Crédito de Carbono no contexto do agronegócio sustentável?",
+        question: "O que é o Crédito de Carbono no contexto do agronegócio sustentável?",
         options: ["Um imposto cobrado de quem planta árvores", "Uma certificação que recompensa financeiramente propriedades que reduzem emissões ou sequestram gases estufa", "Um financiamento bancário para a compra de combustíveis fósseis", "O limite máximo de poeira que uma fazenda pode gerar"],
         answer: 1
     },
@@ -51,6 +64,7 @@ const questions = [
     }
 ];
 
+// 3. VARIÁVEIS DE CONTROLE DE ESTADO
 let currentQuestionIndex = 0;
 let totalScore = 0;
 let consecutiveStreak = 0;
@@ -58,17 +72,7 @@ let timeLeft = 15;
 let timerInterval = null; 
 let currentCorrectIndexMapped = 0;
 
-const questionCounterEl = document.getElementById("question-counter");
-const questionTextEl = document.getElementById("question-text");
-const optionsContainerEl = document.getElementById("options-container");
-const nextBtn = document.getElementById("next-btn");
-const gameBox = document.getElementById("game-box");
-const resultBox = document.getElementById("result-box");
-const scoreTextEl = document.getElementById("score-text");
-const restartBtn = document.getElementById("restart-btn");
-const timerDisplayEl = document.getElementById("timer-display");
-const streakDisplayEl = document.getElementById("streak-display");
-
+// 4. FUNÇÕES DE LÓGICA E EMBARALHAMENTO
 function shuffleArray(array) {
     const newArray = [...array];
     for (let i = newArray.length - 1; i > 0; i--) {
@@ -82,8 +86,8 @@ function startGame() {
     currentQuestionIndex = 0;
     totalScore = 0;
     consecutiveStreak = 0;
-    resultBox.classList.add("hide");
-    gameBox.classList.remove("hide");
+    if (resultBox) resultBox.classList.add("hide");
+    if (gameBox) gameBox.classList.remove("hide");
     showQuestion();
 }
 
@@ -92,11 +96,15 @@ function showQuestion() {
     
     let currentQuestion = questions[currentQuestionIndex];
     
-    questionTextEl.classList.add("fade-in");
-    optionsContainerEl.classList.add("fade-in");
+    if (questionTextEl) questionTextEl.classList.add("fade-in");
+    if (optionsContainerEl) optionsContainerEl.classList.add("fade-in");
 
-    questionCounterEl.innerText = `Pergunta ${currentQuestionIndex + 1} de ${questions.length}`;
-    questionTextEl.innerText = currentQuestion.question;
+    if (questionCounterEl) {
+        questionCounterEl.innerText = `Pergunta ${currentQuestionIndex + 1} de ${questions.length}`;
+    }
+    if (questionTextEl) {
+        questionTextEl.innerText = currentQuestion.question;
+    }
 
     updateStreakDisplay();
 
@@ -104,19 +112,21 @@ function showQuestion() {
     const shuffledOptions = shuffleArray(currentQuestion.options);
     currentCorrectIndexMapped = shuffledOptions.indexOf(correctOptionText);
 
-    shuffledOptions.forEach((option, index) => {
-        const button = document.createElement("button");
-        button.innerText = option;
-        button.classList.add("option-btn");
-        button.addEventListener("click", () => selectOption(index));
-        optionsContainerEl.appendChild(button);
-    });
+    if (optionsContainerEl) {
+        shuffledOptions.forEach((option, index) => {
+            const button = document.createElement("button");
+            button.innerText = option;
+            button.classList.add("option-btn");
+            button.addEventListener("click", () => selectOption(index));
+            optionsContainerEl.appendChild(button);
+        });
+    }
 
     startTimer();
 }
 
 function resetState() {
-    nextBtn.classList.add("hide");
+    if (nextBtn) nextBtn.classList.add("hide");
     
     if (timerInterval) {
         clearInterval(timerInterval);
@@ -124,13 +134,15 @@ function resetState() {
     }
     
     timeLeft = 15;
-    timerDisplayEl.innerText = `⏱️ Tempo: ${timeLeft}s`;
+    if (timerDisplayEl) timerDisplayEl.innerText = `⏱️ Tempo: ${timeLeft}s`;
     
-    questionTextEl.classList.remove("fade-in");
-    optionsContainerEl.classList.remove("fade-in");
+    if (questionTextEl) questionTextEl.classList.remove("fade-in");
+    if (optionsContainerEl) optionsContainerEl.classList.remove("fade-in");
 
-    while (optionsContainerEl.firstChild) {
-        optionsContainerEl.removeChild(optionsContainerEl.firstChild);
+    if (optionsContainerEl) {
+        while (optionsContainerEl.firstChild) {
+            optionsContainerEl.removeChild(optionsContainerEl.firstChild);
+        }
     }
 }
 
@@ -139,7 +151,7 @@ function startTimer() {
     
     timerInterval = setInterval(() => {
         timeLeft--;
-        timerDisplayEl.innerText = `⏱️ Tempo: ${timeLeft}s`;
+        if (timerDisplayEl) timerDisplayEl.innerText = `⏱️ Tempo: ${timeLeft}s`;
         
         if (timeLeft <= 0) {
             clearInterval(timerInterval);
@@ -151,17 +163,17 @@ function startTimer() {
 
 function autoTimeOut() {
     consecutiveStreak = 0;
-    const buttons = optionsContainerEl.querySelectorAll(".option-btn");
-
-    buttons.forEach((button, index) => {
-        button.disabled = true;
-        if (index === currentCorrectIndexMapped) {
-            button.classList.add("correct");
-        }
-    });
-
+    if (optionsContainerEl) {
+        const buttons = optionsContainerEl.querySelectorAll(".option-btn");
+        buttons.forEach((button, index) => {
+            button.disabled = true;
+            if (index === currentCorrectIndexMapped) {
+                button.classList.add("correct");
+            }
+        });
+    }
     updateStreakDisplay();
-    nextBtn.classList.remove("hide");
+    if (nextBtn) nextBtn.classList.remove("hide");
 }
 
 function selectOption(selectedIndex) {
@@ -170,27 +182,30 @@ function selectOption(selectedIndex) {
         timerInterval = null;
     }
     
-    const buttons = optionsContainerEl.querySelectorAll(".option-btn");
+    if (optionsContainerEl) {
+        const buttons = optionsContainerEl.querySelectorAll(".option-btn");
 
-    if (selectedIndex === currentCorrectIndexMapped) {
-        consecutiveStreak++;
-        const pointsGained = 100 * consecutiveStreak;
-        totalScore += pointsGained;
-        buttons[selectedIndex].classList.add("correct");
-    } else {
-        consecutiveStreak = 0;
-        buttons[selectedIndex].classList.add("wrong");
-        if(buttons[currentCorrectIndexMapped]) {
-            buttons[currentCorrectIndexMapped].classList.add("correct");
+        if (selectedIndex === currentCorrectIndexMapped) {
+            consecutiveStreak++;
+            const pointsGained = 100 * consecutiveStreak;
+            totalScore += pointsGained;
+            if (buttons[selectedIndex]) buttons[selectedIndex].classList.add("correct");
+        } else {
+            consecutiveStreak = 0;
+            if (buttons[selectedIndex]) buttons[selectedIndex].classList.add("wrong");
+            if (buttons[currentCorrectIndexMapped]) {
+                buttons[currentCorrectIndexMapped].classList.add("correct");
+            }
         }
-    }
 
-    buttons.forEach(button => button.disabled = true);
+        buttons.forEach(button => button.disabled = true);
+    }
     updateStreakDisplay();
-    nextBtn.classList.remove("hide");
+    if (nextBtn) nextBtn.classList.remove("hide");
 }
 
 function updateStreakDisplay() {
+    if (!streakDisplayEl) return;
     if (consecutiveStreak > 1) {
         streakDisplayEl.innerText = `🔥 Combo: x${consecutiveStreak}`;
         streakDisplayEl.classList.add("active-streak");
@@ -200,17 +215,29 @@ function updateStreakDisplay() {
     }
 }
 
-nextBtn.addEventListener("click", () => {
-    currentQuestionIndex++;
-    if (currentQuestionIndex < questions.length) {
-        showQuestion();
-    } else {
-        showResults();
-    }
-});
+if (nextBtn) {
+    nextBtn.addEventListener("click", () => {
+        currentQuestionIndex++;
+        if (currentQuestionIndex < questions.length) {
+            showQuestion();
+        } else {
+            showResults();
+        }
+    });
+}
 
 function showResults() {
     if (timerInterval) clearInterval(timerInterval);
-    gameBox.classList.add("hide");
-    resultBox.classList.remove("hide");
-    scoreTextEl.innerHTML = `Sua pontuação final foi de:<br><strong style="font-size: 2.2rem; color: var(--primary-color); display: block; margin: 15px 0;">${
+    if (gameBox) gameBox.classList.add("hide");
+    if (resultBox) resultBox.classList.remove("hide");
+    if (scoreTextEl) {
+        scoreTextEl.innerHTML = `Sua pontuação final foi de:<br><strong style="font-size: 2.2rem; color: var(--primary-color); display: block; margin: 15px 0;">${totalScore} pontos</strong>Parabéns por praticar e apoiar o Agroforte Sustentável!`;
+    }
+}
+
+if (restartBtn) {
+    restartBtn.addEventListener("click", startGame);
+}
+
+// 5. INICIALIZADOR SEGURO DO JOGO
+startGame();
