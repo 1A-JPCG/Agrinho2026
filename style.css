@@ -1,0 +1,122 @@
+:root {
+    --primary-color: #2e7d32;
+    --secondary-color: #81c784;
+    --background-color: #f1f8e9;
+    --text-color: #333;
+    --white: #ffffff;
+    --correct-color: #4caf50;
+    --wrong-color: #f44336;
+}
+
+body {
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    background-color: var(--background-color);
+    color: var(--text-color);
+    margin: 0;
+    padding: 20px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    min-height: 100vh;
+}
+
+.quiz-container {
+    background-color: var(--white);
+    padding: 30px;
+    border-radius: 12px;
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+    max-width: 600px;
+    width: 100%;
+}
+
+header {
+    text-align: center;
+    border-bottom: 2px solid var(--secondary-color);
+    padding-bottom: 15px;
+    margin-bottom: 20px;
+}
+
+header h1 {
+    margin: 0;
+    color: var(--primary-color);
+}
+
+header p {
+    margin: 5px 0 0 0;
+    font-size: 0.9rem;
+    color: #666;
+}
+
+#question-counter {
+    font-weight: bold;
+    color: var(--primary-color);
+    margin-bottom: 10px;
+}
+
+#question-text {
+    font-size: 1.2rem;
+    margin-bottom: 20px;
+    font-weight: 600;
+}
+
+.option-btn {
+    display: block;
+    width: 100%;
+    padding: 12px 15px;
+    margin-bottom: 10px;
+    background-color: #fafafa;
+    border: 2px solid #e0e0e0;
+    border-radius: 8px;
+    text-align: left;
+    font-size: 1rem;
+    cursor: pointer;
+    transition: all 0.2s ease;
+}
+
+.option-btn:hover {
+    background-color: #f0f0f0;
+    border-color: #bdbdbd;
+}
+
+.option-btn.correct {
+    background-color: var(--correct-color);
+    color: white;
+    border-color: var(--correct-color);
+}
+
+.option-btn.wrong {
+    background-color: var(--wrong-color);
+    color: white;
+    border-color: var(--wrong-color);
+}
+
+button#next-btn, button#restart-btn {
+    display: block;
+    width: 100%;
+    padding: 12px;
+    background-color: var(--primary-color);
+    color: white;
+    border: none;
+    border-radius: 8px;
+    font-size: 1rem;
+    font-weight: bold;
+    cursor: pointer;
+    margin-top: 20px;
+}
+
+button#next-btn:hover, button#restart-btn:hover {
+    background-color: #1b5e20;
+}
+
+.hide {
+    display: none !important;
+}
+
+#result-box {
+    text-align: center;
+}
+
+#score-text {
+    font-size: 1.3rem;
+    margin: 20px 0;
+}
