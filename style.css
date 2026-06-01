@@ -6,7 +6,6 @@
     --white: #ffffff;
     --correct-color: #4caf50;
     --wrong-color: #f44336;
-    --warn-color: #ff9800;
 }
 
 body {
@@ -48,38 +47,10 @@ header p {
     color: #666;
 }
 
-/* Painel de Status (Tempo e Combo) */
-#status-panel {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    margin-bottom: 20px;
-    padding: 10px 15px;
-    background-color: #f5f5f5;
-    border-radius: 8px;
-    font-weight: bold;
-    font-size: 1.05rem;
-}
-
-#timer-display {
-    color: var(--wrong-color);
-}
-
-#streak-display {
-    color: var(--primary-color);
-    transition: all 0.3s ease;
-}
-
-/* Classe especial para animar o combo ativo */
-.active-streak {
-    color: var(--warn-color) !important;
-    animation: pulse 0.5s ease infinite alternate;
-}
-
 #question-counter {
     font-weight: bold;
     color: var(--primary-color);
-    margin-bottom: 10px;
+    margin-bottom: 15px;
 }
 
 #question-text {
@@ -153,9 +124,4 @@ button#next-btn:hover, button#restart-btn:hover {
     font-size: 1.3rem;
     margin: 20px 0;
     line-height: 1.6;
-}
-
-@keyframes pulse {
-    from { transform: scale(1); }
-    to { transform: scale(1.05); }
 }
