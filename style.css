@@ -48,7 +48,6 @@ header p {
     color: #666;
 }
 
-/* Painel de Status (Tempo e Combo) */
 #status-panel {
     display: flex;
     justify-content: space-between;
@@ -70,7 +69,6 @@ header p {
     transition: all 0.3s ease;
 }
 
-/* Classe especial para animar o combo ativo */
 .active-streak {
     color: var(--warn-color) !important;
     animation: pulse 0.5s ease infinite alternate;

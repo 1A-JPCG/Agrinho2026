@@ -26,7 +26,7 @@ const questions = [
     },
     {
         question: "O que caracteriza a técnica de rotação de culturas na agricultura sustentável?",
-        options: ["Alternar as espécies plantadas em uma mesma área para recuperar o solo e quebrar o ciclo de pragas", "Girar as máquinas agrícolas no campo para compactar a terra uniformemente", "Substituir anualmente toda a mão de obra da fazenda", "Plantar apenas em terrenos com inclinação circular"],
+        options: ["Alternar as espécies plantadas em uma mesma área para recuperar o solo e quebrar o ciclo de pragas", "Girar as máquinas agrícolas no campo para compactar a terra uniformemente", "Substituir anualmente toda a mão de obra da fazenda", "Plantar apenas em terrenos com inclinacao circular"],
         answer: 0
     },
     {
@@ -41,7 +41,7 @@ const questions = [
     },
     {
         question: "O que é o Crédito de Carbono no contexto do agronegócio sustentável?",
-        options: ["Um imposto cobrado de quem planta árvores", "Uma certificação que recompensa financeiramente propriedades que reduzem emissões ou sequestram gases estufa", "Un financiamento bancário para a compra de combustíveis fósseis", "O limite máximo de poeira que uma fazenda pode gerar"],
+        options: ["Um imposto cobrado de quem planta árvores", "Uma certificação que recompensa financeiramente propriedades que reduzem emissões ou sequestram gases estufa", "Um financiamento bancário para a compra de combustíveis fósseis", "O limite máximo de poeira que uma fazenda pode gerar"],
         answer: 1
     },
     {
@@ -57,6 +57,9 @@ let consecutiveStreak = 0;
 let timeLeft = 15;
 let timerInterval;
 
+// Variável para armazenar o índice correto da opção embaralhada atual
+let currentCorrectIndexMapped = 0;
+
 const questionCounterEl = document.getElementById("question-counter");
 const questionTextEl = document.getElementById("question-text");
 const optionsContainerEl = document.getElementById("options-container");
@@ -67,6 +70,16 @@ const scoreTextEl = document.getElementById("score-text");
 const restartBtn = document.getElementById("restart-btn");
 const timerDisplayEl = document.getElementById("timer-display");
 const streakDisplayEl = document.getElementById("streak-display");
+
+// Função utilitária para embaralhar Arrays (Algoritmo Fisher-Yates)
+function shuffleArray(array) {
+    const newArray = [...array];
+    for (let i = newArray.length - 1; i > 0; i--) {
+        const j = Math.floor(Math.random() * (i + 1));
+        [newArray[i], newArray[j]] = [newArray[j], newArray[i]];
+    }
+    return newArray;
+}
 
 function startGame() {
     currentQuestionIndex = 0;
@@ -85,7 +98,17 @@ function showQuestion() {
 
     updateStreakDisplay();
 
-    currentQuestion.options.forEach((option, index) => {
+    // Salva o texto da resposta correta original antes de embaralhar
+    const correctOptionText = currentQuestion.options[currentQuestion.answer];
+
+    // Cria uma nova lista com as opções embaralhadas
+    const shuffledOptions = shuffleArray(currentQuestion.options);
+
+    // Descobre onde a resposta certa foi parar na nova lista embaralhada
+    currentCorrectIndexMapped = shuffledOptions.indexOf(correctOptionText);
+
+    // Renderiza os botões com a ordem embaralhada
+    shuffledOptions.forEach((option, index) => {
         const button = document.createElement("button");
         button.innerText = option;
         button.classList.add("option-btn");
@@ -120,13 +143,11 @@ function startTimer() {
 
 function autoTimeOut() {
     consecutiveStreak = 0;
-    const currentQuestion = questions[currentQuestionIndex];
-    const correctIndex = currentQuestion.answer;
     const buttons = optionsContainerEl.querySelectorAll(".option-btn");
 
     buttons.forEach((button, index) => {
         button.disabled = true;
-        if (index === correctIndex) {
+        if (index === currentCorrectIndexMapped) {
             button.classList.add("correct");
         }
     });
@@ -137,11 +158,9 @@ function autoTimeOut() {
 
 function selectOption(selectedIndex) {
     clearInterval(timerInterval);
-    const currentQuestion = questions[currentQuestionIndex];
-    const correctIndex = currentQuestion.answer;
     const buttons = optionsContainerEl.querySelectorAll(".option-btn");
 
-    if (selectedIndex === correctIndex) {
+    if (selectedIndex === currentCorrectIndexMapped) {
         consecutiveStreak++;
         const pointsGained = 100 * consecutiveStreak;
         totalScore += pointsGained;
@@ -149,7 +168,7 @@ function selectOption(selectedIndex) {
     } else {
         consecutiveStreak = 0;
         buttons[selectedIndex].classList.add("wrong");
-        buttons[correctIndex].classList.add("correct");
+        buttons[currentCorrectIndexMapped].classList.add("correct");
     }
 
     buttons.forEach(button => button.disabled = true);
