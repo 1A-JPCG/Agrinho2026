@@ -26,7 +26,7 @@ const questions = [
     },
     {
         question: "O que caracteriza a técnica de rotação de culturas na agricultura sustentável?",
-        options: ["Alternar as espécies plantadas em uma mesma área para recuperar o solo e quebrar o ciclo de pragas", "Girar as máquinas agrícolas no campo para compactar a terra uniformemente", "Substituir anualmente toda a mão de obra da fazenda", "Plantar apenas em terrenos com inclinacao circular"],
+        options: ["Alternar as espécies plantadas em uma mesma área para recuperar o solo e quebrar o ciclo de pragas", "Girar as máquinas agrícolas no campo para compactar a terra uniformemente", "Substituir anualmente toda a mão de obra da fazenda", "Plantar apenas em terrenos com inclinação circular"],
         answer: 0
     },
     {
@@ -40,7 +40,7 @@ const questions = [
         answer: 0
     },
     {
-        question: "O que é o Crédito de Carbono no contexto do agronegócio sustentável?",
+        question: "O que é a Crédito de Carbono no contexto do agronegócio sustentável?",
         options: ["Um imposto cobrado de quem planta árvores", "Uma certificação que recompensa financeiramente propriedades que reduzem emissões ou sequestram gases estufa", "Um financiamento bancário para a compra de combustíveis fósseis", "O limite máximo de poeira que uma fazenda pode gerar"],
         answer: 1
     },
@@ -55,9 +55,7 @@ let currentQuestionIndex = 0;
 let totalScore = 0;
 let consecutiveStreak = 0;
 let timeLeft = 15;
-let timerInterval;
-
-// Variável para armazenar o índice correto da opção embaralhada atual
+let timerInterval = null; 
 let currentCorrectIndexMapped = 0;
 
 const questionCounterEl = document.getElementById("question-counter");
@@ -71,7 +69,6 @@ const restartBtn = document.getElementById("restart-btn");
 const timerDisplayEl = document.getElementById("timer-display");
 const streakDisplayEl = document.getElementById("streak-display");
 
-// Função utilitária para embaralhar Arrays (Algoritmo Fisher-Yates)
 function shuffleArray(array) {
     const newArray = [...array];
     for (let i = newArray.length - 1; i > 0; i--) {
@@ -92,22 +89,21 @@ function startGame() {
 
 function showQuestion() {
     resetState();
+    
     let currentQuestion = questions[currentQuestionIndex];
+    
+    questionTextEl.classList.add("fade-in");
+    optionsContainerEl.classList.add("fade-in");
+
     questionCounterEl.innerText = `Pergunta ${currentQuestionIndex + 1} de ${questions.length}`;
     questionTextEl.innerText = currentQuestion.question;
 
     updateStreakDisplay();
 
-    // Salva o texto da resposta correta original antes de embaralhar
     const correctOptionText = currentQuestion.options[currentQuestion.answer];
-
-    // Cria uma nova lista com as opções embaralhadas
     const shuffledOptions = shuffleArray(currentQuestion.options);
-
-    // Descobre onde a resposta certa foi parar na nova lista embaralhada
     currentCorrectIndexMapped = shuffledOptions.indexOf(correctOptionText);
 
-    // Renderiza os botões com a ordem embaralhada
     shuffledOptions.forEach((option, index) => {
         const button = document.createElement("button");
         button.innerText = option;
@@ -121,21 +117,33 @@ function showQuestion() {
 
 function resetState() {
     nextBtn.classList.add("hide");
-    clearInterval(timerInterval);
+    
+    if (timerInterval) {
+        clearInterval(timerInterval);
+        timerInterval = null;
+    }
+    
     timeLeft = 15;
-    timerDisplayEl.innerText = `Tempo: ${timeLeft}s`;
+    timerDisplayEl.innerText = `⏱️ Tempo: ${timeLeft}s`;
+    
+    questionTextEl.classList.remove("fade-in");
+    optionsContainerEl.classList.remove("fade-in");
+
     while (optionsContainerEl.firstChild) {
         optionsContainerEl.removeChild(optionsContainerEl.firstChild);
     }
 }
 
 function startTimer() {
+    if (timerInterval) clearInterval(timerInterval);
+    
     timerInterval = setInterval(() => {
         timeLeft--;
-        timerDisplayEl.innerText = `Tempo: ${timeLeft}s`;
+        timerDisplayEl.innerText = `⏱️ Tempo: ${timeLeft}s`;
         
         if (timeLeft <= 0) {
             clearInterval(timerInterval);
+            timerInterval = null;
             autoTimeOut();
         }
     }, 1000);
@@ -157,7 +165,11 @@ function autoTimeOut() {
 }
 
 function selectOption(selectedIndex) {
-    clearInterval(timerInterval);
+    if (timerInterval) {
+        clearInterval(timerInterval);
+        timerInterval = null;
+    }
+    
     const buttons = optionsContainerEl.querySelectorAll(".option-btn");
 
     if (selectedIndex === currentCorrectIndexMapped) {
@@ -168,7 +180,9 @@ function selectOption(selectedIndex) {
     } else {
         consecutiveStreak = 0;
         buttons[selectedIndex].classList.add("wrong");
-        buttons[currentCorrectIndexMapped].classList.add("correct");
+        if(buttons[currentCorrectIndexMapped]) {
+            buttons[currentCorrectIndexMapped].classList.add("correct");
+        }
     }
 
     buttons.forEach(button => button.disabled = true);
@@ -196,12 +210,7 @@ nextBtn.addEventListener("click", () => {
 });
 
 function showResults() {
+    if (timerInterval) clearInterval(timerInterval);
     gameBox.classList.add("hide");
     resultBox.classList.remove("hide");
-    scoreTextEl.innerHTML = `Sua pontuação final foi de:<br><strong style="font-size: 2rem; color: var(--primary-color);">${totalScore} pontos</strong>!<br>Parabéns por praticar o Agroforte!`;
-}
-
-restartBtn.addEventListener("click", startGame);
-
-// Inicia o jogo ao carregar a página
-startGame();
+    scoreTextEl.innerHTML = `Sua pontuação final foi de:<br><strong style="font-size: 2.2rem; color: var(--primary-color); display: block; margin: 15px 0;">${
