@@ -52,7 +52,10 @@ const questions = [
 ];
 
 let currentQuestionIndex = 0;
-let score = 0;
+let totalScore = 0;
+let consecutiveStreak = 0;
+let timeLeft = 15;
+let timerInterval;
 
 const questionCounterEl = document.getElementById("question-counter");
 const questionTextEl = document.getElementById("question-text");
@@ -62,10 +65,13 @@ const gameBox = document.getElementById("game-box");
 const resultBox = document.getElementById("result-box");
 const scoreTextEl = document.getElementById("score-text");
 const restartBtn = document.getElementById("restart-btn");
+const timerDisplayEl = document.getElementById("timer-display");
+const streakDisplayEl = document.getElementById("streak-display");
 
 function startGame() {
     currentQuestionIndex = 0;
-    score = 0;
+    totalScore = 0;
+    consecutiveStreak = 0;
     resultBox.classList.add("hide");
     gameBox.classList.remove("hide");
     showQuestion();
@@ -77,6 +83,8 @@ function showQuestion() {
     questionCounterEl.innerText = `Pergunta ${currentQuestionIndex + 1} de ${questions.length}`;
     questionTextEl.innerText = currentQuestion.question;
 
+    updateStreakDisplay();
+
     currentQuestion.options.forEach((option, index) => {
         const button = document.createElement("button");
         button.innerText = option;
@@ -84,34 +92,79 @@ function showQuestion() {
         button.addEventListener("click", () => selectOption(index));
         optionsContainerEl.appendChild(button);
     });
+
+    startTimer();
 }
 
 function resetState() {
     nextBtn.classList.add("hide");
+    clearInterval(timerInterval);
+    timeLeft = 15;
+    timerDisplayEl.innerText = `Tempo: ${timeLeft}s`;
     while (optionsContainerEl.firstChild) {
         optionsContainerEl.removeChild(optionsContainerEl.firstChild);
     }
 }
 
-function selectOption(selectedIndex) {
+function startTimer() {
+    timerInterval = setInterval(() => {
+        timeLeft--;
+        timerDisplayEl.innerText = `Tempo: ${timeLeft}s`;
+        
+        if (timeLeft <= 0) {
+            clearInterval(timerInterval);
+            autoTimeOut();
+        }
+    }, 1000);
+}
+
+function autoTimeOut() {
+    consecutiveStreak = 0;
     const currentQuestion = questions[currentQuestionIndex];
     const correctIndex = currentQuestion.answer;
     const buttons = optionsContainerEl.querySelectorAll(".option-btn");
 
     buttons.forEach((button, index) => {
-        button.disabled = true; // Desabilita as opções após o clique
+        button.disabled = true;
         if (index === correctIndex) {
-            button.classList.add("correct"); // Revela a verde
-        } else if (index === selectedIndex) {
-            button.classList.add("wrong"); // Se errou, pinta de vermelho
+            button.classList.add("correct");
         }
     });
 
+    updateStreakDisplay();
+    nextBtn.classList.remove("hide");
+}
+
+function selectOption(selectedIndex) {
+    clearInterval(timerInterval);
+    const currentQuestion = questions[currentQuestionIndex];
+    const correctIndex = currentQuestion.answer;
+    const buttons = optionsContainerEl.querySelectorAll(".option-btn");
+
     if (selectedIndex === correctIndex) {
-        score++;
+        consecutiveStreak++;
+        const pointsGained = 100 * consecutiveStreak;
+        totalScore += pointsGained;
+        buttons[selectedIndex].classList.add("correct");
+    } else {
+        consecutiveStreak = 0;
+        buttons[selectedIndex].classList.add("wrong");
+        buttons[correctIndex].classList.add("correct");
     }
 
+    buttons.forEach(button => button.disabled = true);
+    updateStreakDisplay();
     nextBtn.classList.remove("hide");
+}
+
+function updateStreakDisplay() {
+    if (consecutiveStreak > 1) {
+        streakDisplayEl.innerText = `🔥 Combo: x${consecutiveStreak}`;
+        streakDisplayEl.classList.add("active-streak");
+    } else {
+        streakDisplayEl.innerText = `Combo: x1`;
+        streakDisplayEl.classList.remove("active-streak");
+    }
 }
 
 nextBtn.addEventListener("click", () => {
@@ -126,7 +179,7 @@ nextBtn.addEventListener("click", () => {
 function showResults() {
     gameBox.classList.add("hide");
     resultBox.classList.remove("hide");
-    scoreTextEl.innerHTML = `Você acertou <strong style="color: var(--primary-color); font-size: 1.6rem;">${score}</strong> de <strong>${questions.length}</strong> perguntas!<br>Obrigado por conhecer mais sobre o Agroforte.`;
+    scoreTextEl.innerHTML = `Sua pontuação final foi de:<br><strong style="font-size: 2rem; color: var(--primary-color);">${totalScore} pontos</strong>!<br>Parabéns por praticar o Agroforte!`;
 }
 
 restartBtn.addEventListener("click", startGame);
