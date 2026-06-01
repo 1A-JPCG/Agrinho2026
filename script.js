@@ -1,4 +1,4 @@
-// 1. MAPEAMENTO DE ELEMENTOS DO DOM (No topo do arquivo para evitar erros de inicialização)
+// 1. MAPEAMENTO DE ELEMENTOS DO DOM
 const questionCounterEl = document.getElementById("question-counter");
 const questionTextEl = document.getElementById("question-text");
 const optionsContainerEl = document.getElementById("options-container");
@@ -64,7 +64,7 @@ const questions = [
     }
 ];
 
-// 3. VARIÁVEIS DE CONTROLE DE ESTADO
+// 3. VARIÁVEIS DE ESTADO
 let currentQuestionIndex = 0;
 let totalScore = 0;
 let consecutiveStreak = 0;
@@ -72,7 +72,7 @@ let timeLeft = 15;
 let timerInterval = null; 
 let currentCorrectIndexMapped = 0;
 
-// 4. FUNÇÕES DE LÓGICA E EMBARALHAMENTO
+// 4. ALGORITMO FISHER-YATES DE EMBARALHAMENTO
 function shuffleArray(array) {
     const newArray = [...array];
     for (let i = newArray.length - 1; i > 0; i--) {
@@ -87,7 +87,11 @@ function startGame() {
     totalScore = 0;
     consecutiveStreak = 0;
     if (resultBox) resultBox.classList.add("hide");
-    if (gameBox) gameBox.classList.remove("hide");
+    if (gameBox) {
+        gameBox.classList.remove("hide");
+        gameBox.classList.remove("fade-out");
+        gameBox.classList.add("fade-in");
+    }
     showQuestion();
 }
 
@@ -95,9 +99,6 @@ function showQuestion() {
     resetState();
     
     let currentQuestion = questions[currentQuestionIndex];
-    
-    if (questionTextEl) questionTextEl.classList.add("fade-in");
-    if (optionsContainerEl) optionsContainerEl.classList.add("fade-in");
 
     if (questionCounterEl) {
         questionCounterEl.innerText = `Pergunta ${currentQuestionIndex + 1} de ${questions.length}`;
@@ -108,6 +109,7 @@ function showQuestion() {
 
     updateStreakDisplay();
 
+    // Mapeamento dinâmico anti-decoreba de botões
     const correctOptionText = currentQuestion.options[currentQuestion.answer];
     const shuffledOptions = shuffleArray(currentQuestion.options);
     currentCorrectIndexMapped = shuffledOptions.indexOf(correctOptionText);
@@ -135,9 +137,6 @@ function resetState() {
     
     timeLeft = 15;
     if (timerDisplayEl) timerDisplayEl.innerText = `⏱️ Tempo: ${timeLeft}s`;
-    
-    if (questionTextEl) questionTextEl.classList.remove("fade-in");
-    if (optionsContainerEl) optionsContainerEl.classList.remove("fade-in");
 
     if (optionsContainerEl) {
         while (optionsContainerEl.firstChild) {
@@ -215,14 +214,27 @@ function updateStreakDisplay() {
     }
 }
 
-if (nextBtn) {
+// TRANSIÇÃO DE TELA COM EFEITO DE DOIS TEMPOS (FADE-OUT -> FADE-IN)
+if (nextBtn && gameBox) {
     nextBtn.addEventListener("click", () => {
-        currentQuestionIndex++;
-        if (currentQuestionIndex < questions.length) {
-            showQuestion();
-        } else {
-            showResults();
-        }
+        // Passo 1: Inicia a animação de sumiço
+        gameBox.classList.remove("fade-in");
+        gameBox.classList.add("fade-out");
+
+        // Passo 2: Aguarda 250ms (tempo do CSS) para mudar o conteúdo às escuras
+        setTimeout(() => {
+            currentQuestionIndex++;
+            if (currentQuestionIndex < questions.length) {
+                showQuestion();
+                // Passo 3: Traz o conteúdo reembaralhado à tela suavemente
+                gameBox.classList.remove("fade-out");
+                gameBox.classList.add("fade-in");
+            } else {
+                showResults();
+                gameBox.classList.remove("fade-out");
+                gameBox.classList.add("fade-in");
+            }
+        }, 250);
     });
 }
 
@@ -239,5 +251,5 @@ if (restartBtn) {
     restartBtn.addEventListener("click", startGame);
 }
 
-// 5. INICIALIZADOR SEGURO DO JOGO
+// INICIALIZADOR SEGURO
 startGame();

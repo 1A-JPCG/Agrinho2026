@@ -13,7 +13,6 @@
     --warn-color: #ff9800;
     --shadow-sm: 0 2px 8px rgba(0,0,0,0.05);
     --shadow-md: 0 10px 30px rgba(46, 125, 50, 0.1);
-    --transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
 }
 
 * {
@@ -89,7 +88,6 @@ header p {
     color: var(--text-muted);
     font-weight: 700;
     font-size: 1rem;
-    transition: var(--transition);
 }
 
 .active-streak {
@@ -127,8 +125,8 @@ header p {
     font-weight: 500;
     color: #4a5568;
     cursor: pointer;
-    transition: var(--transition);
     box-shadow: var(--shadow-sm);
+    transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
 }
 
 .option-btn:hover:not(:disabled) {
@@ -171,7 +169,7 @@ button#next-btn, button#restart-btn {
     cursor: pointer;
     margin-top: 25px;
     box-shadow: 0 4px 12px rgba(46, 125, 50, 0.2);
-    transition: var(--transition);
+    transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
 }
 
 button#next-btn:hover, button#restart-btn:hover {
@@ -207,11 +205,15 @@ button#next-btn:hover, button#restart-btn:hover {
     to { transform: scale(1.03); }
 }
 
-.fade-in {
-    animation: fadeInAnimation 0.35s ease-out forwards;
+/* CLASSES MODERNAS DE TRANSIÇÃO DA CAIXA DO JOGO */
+.fade-out {
+    opacity: 0;
+    transform: translateY(-8px);
+    transition: all 0.25s ease-in;
 }
 
-@keyframes fadeInAnimation {
-    from { opacity: 0; transform: translateY(8px); }
-    to { opacity: 1; transform: translateY(0); }
+.fade-in {
+    opacity: 1;
+    transform: translateY(0);
+    transition: all 0.3s ease-out;
 }
